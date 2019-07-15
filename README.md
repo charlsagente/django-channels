@@ -1,2 +1,6 @@
-# django2
-Django 2 projects
+# Django project
+Using Django 2 libraries in dev environment:
+* Channels
+
+
+
