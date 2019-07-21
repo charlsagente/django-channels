@@ -18,7 +18,7 @@ class ContactForm(forms.Form):
         send_mail(
             "Site message",
             message,
-            "site@booktikme.domain",
+            "site@booktime.domain",
             ["customerservice@booktime.domain"],
             fail_silently=False,
         )

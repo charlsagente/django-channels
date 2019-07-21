@@ -9,6 +9,11 @@
     <link rel="stylesheet" href="{% static "css/bootstrap.min.css" %}">
 
     <title>BookTime</title>
+    <style type="text/css">
+        body {
+            margin: 0 10% 0 10%;
+        }
+    </style>
 </head>
 <body>
 <nav class="navbar navbar-expand-lg navbar-light bg-­light">
@@ -32,6 +37,11 @@
                     class="nav-item {% if request.path == "/about-us/" %}active {% endif %}">
                 <a class="nav-link" href="/about-us/">About us</a>
             </li>
+            <li class="nav-item {% if request.path == "/contact-us/" %}active {% endif %}" >
+                <a class="nav-link" href="/contact-us/">Contact us</a>
+            </li>
+
+
         </ul>
     </div>
 </nav>
