@@ -1,0 +1,47 @@
+[
+{
+  "model": "main.producttag",
+  "fields": {
+    "name": "OpenSource",
+    "slug": "OpenSource",
+    "description": "ddfhfnfv vrjfjf jfksljlfjfjlsfjjlfsjls\r\ns\r\nf\r\nsf\r\ns\r\nf\r\ns\r\nffs\r\nsf\r\n\r\nsf\r\nf",
+    "active": true
+  }
+},
+{
+  "model": "main.producttag",
+  "fields": {
+    "name": "Closed Source",
+    "slug": "closed-source",
+    "description": "",
+    "active": true
+  }
+},
+{
+  "model": "main.producttag",
+  "fields": {
+    "name": "Romance",
+    "slug": "romance",
+    "description": "",
+    "active": true
+  }
+},
+{
+  "model": "main.producttag",
+  "fields": {
+    "name": "Teamwork",
+    "slug": "teamwork",
+    "description": "",
+    "active": true
+  }
+},
+{
+  "model": "main.producttag",
+  "fields": {
+    "name": "Drama",
+    "slug": "drama",
+    "description": "",
+    "active": true
+  }
+}
+]
