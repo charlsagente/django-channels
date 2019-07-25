@@ -44,14 +44,14 @@ class Command(BaseCommand):
                     image=ImageFile(f, name=row["image_filename"]),
                 )
                 image.save()
-                c["products"] += 1
+                c["images"] += 1
 
             product.save()
             c["products"] += 1
             if created:
                 c["products_created"] += 1
         self.stdout.write(
-            "Products proccessed=%d (created=%d)"
+            "Products processed=%d (created=%d)"
             % (c["products"], c["products_created"])
         )
         self.stdout.write(
