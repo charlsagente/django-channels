@@ -17,7 +17,7 @@ class TestImport(TestCase):
         self.assertTrue(os.path.exists(args[0]))
         self.assertTrue(os.path.exists(args[1]))
 
-        call_command('import_data', *args, stdout=out) # Django offers this fn to invoke management commands
+        call_command('import_data', *args, stdout=out)  # Django offers this fn to invoke management commands
         expected_out = ("Importing products\n"
                         "Products processed=3 (created=3)\n"
                         "Tags processed=6 (created=6)\n"

@@ -18,4 +18,9 @@ urlpatterns = [
         views.ContactUsView.as_view(),
         name="contact_us",
     ),
+    path(
+        "products/<slug:tag>/",
+        views.ProductListView.as_view(),
+        name="products",
+    ),
 ]
