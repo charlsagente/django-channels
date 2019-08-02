@@ -34,4 +34,7 @@ urlpatterns = [
         TemplateView.as_view(),
         name="add_to_basket",
     ),
+    path(
+        "signup/", views.SignUpView.as_view(), name="signup"
+    ),
 ]
