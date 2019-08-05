@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h2>Basket</h2>
+    {% if formset %}
+        <p>You can adjust the quantities below.</p>
+        <form method="post">
+            {% csrf_token %}
+            {{ formset.management_form }}
+            {% for form in formset %}
+                <p>
+                    <strong>{{ form.instance.product.name }}</strong><br>
+                    {{ form }}
+                </p>
+            {% endfor %}
+            <button type="submit" class="btn btn-primary">Update</button>
+        </form>
+    {% else %}
+        <p>You have no items in the basket.</p>
+    {% endif %}
+{% endblock content %}

@@ -26,6 +26,11 @@ urlpatterns = [
         name="address_delete",
     ),
     path(
+        "add_to_basket/",
+        views.add_to_basket,
+        name="add_to_basket",
+    ),
+    path(
         "login/",
         auth_views.LoginView.as_view(
             template_name="login.html",
@@ -59,9 +64,9 @@ urlpatterns = [
         name="product",
     ),
     path(
-        "",
-        TemplateView.as_view(),
-        name="add_to_basket",
+        "basket/",
+        views.manage_basket,
+        name="basket",
     ),
     path(
         "signup/", views.SignUpView.as_view(), name="signup"

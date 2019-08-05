@@ -65,8 +65,8 @@ class TestPage(TestCase):
 
         product_list = (
             models.Product.objects.active()
-            .filter(tags__slug="opensource")
-            .order_by("name")
+                .filter(tags__slug="opensource")
+                .order_by("name")
         )
         self.assertEqual(
             list(response.context["object_list"]),
@@ -89,7 +89,7 @@ class TestPage(TestCase):
             "password2": "abcabcabc",
         }
         with patch.object(
-            forms.UserCreationForm, "send_mail"
+                forms.UserCreationForm, "send_mail"
         ) as mock_send:
             response = self.client.post(
                 reverse("signup"), post_data
@@ -156,4 +156,45 @@ class TestPage(TestCase):
 
         self.assertTrue(
             models.Address.objects.filter(user=user1).exists()
+        )
+
+    def test_add_to_basket_loggedin_works(self):
+        user1 = models.User.objects.create_user(
+            "user1@a.com", "opo3jh4oo4"
+        )
+        cb = models.Product.objects.create(
+            name="The cathedral and the bazaar",
+            slug="cathedral-bazaar",
+            price=Decimal("10.00"),
+        )
+        w = models.Product.objects.create(
+            name="Microsoft Gwindows",
+            slug="microsfot-gwindows-guide",
+            price=Decimal("12.00"),
+        )
+        self.client.force_login(user1)
+        response = self.client.get(
+            reverse("add_to_basket"), data={"product_id": cb.id}
+        )
+        response = self.client.get(
+            reverse("add_to_basket"), {"product_id": cb.id}
+        )
+        self.assertTrue(
+            models.Basket.objects.filter(user=user1).exists()
+        )
+        self.assertEquals(
+            models.BasketLine.objects.filter(
+                basket__user=user1
+            ).count(),
+            1,
+        )
+
+        response = self.client.get(
+            reverse("add_to_basket"), {"product_id": w.id}
+        )
+        self.assertEquals(
+            models.BasketLine.objects.filter(
+                basket__user=user1
+            ).count(),
+            2,
         )
