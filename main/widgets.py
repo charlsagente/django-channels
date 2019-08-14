@@ -8,4 +8,4 @@ class PlusMinusNumberInput(Widget):
         css = {
             'all': ('css/plusminusnumber.css',)
         }
-        js = ('js/plusminusnumber.js')
+        js = ('js/plusminusnumber.js',)
