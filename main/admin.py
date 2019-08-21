@@ -98,7 +98,7 @@ class BasketLineInline(admin.TabularInline):
 @admin.register(models.Basket)
 class BasketAdmin(admin.ModelAdmin):
     list_display = ("id", "user", "status", "count")
-    raw_id_fields = ("status",)
+    list_editable = ("status",)
     list_filter = ("status",)
     inlines = (BasketLineInline,)
 
@@ -132,14 +132,14 @@ class OrderAdmin(admin.ModelAdmin):
         (
             "Shipping info",
             {
-                "fields": {
+                "fields": (
                     "shipping_name",
                     "shipping_address1",
                     "shipping_address2",
                     "shipping_zip_code",
                     "shipping_city",
                     "shipping_country",
-                }
+                )
             },
         ),
     )
