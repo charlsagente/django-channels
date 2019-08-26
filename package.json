@@ -1,0 +1,40 @@
+{
+  "name": "book",
+  "version": "1.0.0",
+  "description": "",
+  "private": true,
+  "scripts": {
+    "test": "jest",
+    "build": "webpack"
+  },
+  "jest": {
+    "moduleDirectories": [
+      "node_modules",
+      "frontend"
+    ],
+    "testURL": "http://localhost/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/charlsagente/django-channels.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/charlsagente/django-channels/issues"
+  },
+  "homepage": "https://github.com/charlsagente/django-channels#readme",
+  "devDependencies": {
+    "enzyme": "^3.10.0",
+    "enzyme-adapter-react-16": "^1.14.0",
+    "jest": "^24.9.0",
+    "webpack": "^4.39.2",
+    "webpack-bundle-tracker": "^0.4.2-beta",
+    "webpack-cli": "^3.3.7"
+  },
+  "dependencies": {
+    "react": "^16.9.0",
+    "react-dom": "^16.9.0"
+  }
+}

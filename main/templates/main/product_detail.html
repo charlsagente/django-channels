@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load render_bundle from webpack_loader %}
 {% block content %}
     <h1>products</h1>
     <table class="table">
@@ -38,67 +39,32 @@
     <a href="{% url "add_to_basket" %}?product_id={{ object.id }}">Add to basket</a>
 {% endblock content %}
 {% block js %}
-    <script src="https://unpkg.com/react@16/umd/react.production.min.js"></script>
-    <script src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js"></script>
+    {% render_bundle 'imageswitcher' %}
+
     <style type="text/css" media="screen">
         .image {
             margin: 10px;
             display: inline-block;
 
         }
-    .img-selected {
-        max-width: 90%;
-    }
-
+        .img-selected {
+            max-width: 90%;
+        }
     </style>
     <script>
-        const e = React.createElement;
-
-        class ImageBox extends React.Component {
-            constructor(props) {
-                super(props);
-                this.state = {
-                    currentImage: this.props.imageStart
-                }
-            }
-
-            click(image) {
-                this.setState({
-                    currentImage: image
-                })
-            }
-
-            render() {
-                const images = this.props.images.map((i) =>
-                    e('div', {className: "image", key: i.id},
-                        e('img', {
-                            onClick: this.click.bind(this, i),
-                            width: 100,
-                            src: i.thumbnail
-                        }),
-                    ),
-                );
-                return e('div', {className:"gallery"},
-                    e('div', {className: "current-image"},
-                        e('img', {src: this.state.currentImage.image, className:"img-selected"})
-                    ),
-                    images)
-            }
-
-        }
-
         document.addEventListener("DOMContentLoaded",
             function(event){
                 var images = [
                     {% for image in object.productimage_set.all %}
-                        {"image": "{{ image.image.url|safe  }}",
-                        "thumbnail": "{{ image.thumbnail.url|safe }}"},
+                        {"image": "{{ image.image.url  }}",
+                        "thumbnail": "{{ image.thumbnail.url }}"},
                     {% endfor %}
                 ];
                 ReactDOM.render(
-                    e(ImageBox, {images: images, imageStart: images[0]}),
-                    document.getElementById('imagebox')
-                );
+                    React.createElement(ImageBox, {
+                        images: images,
+                        imageStart: images[0]
+                    }), document.getElementById('imagebox'));
             }
         );
 
