@@ -54,7 +54,7 @@ class UserCreationForm(DjangoUserCreationForm):
 
 
 class AuthenticationForm(forms.Form):
-    email = forms.EmailField
+    email = forms.EmailField()
     password = forms.CharField(
         strip=False, widget=forms.PasswordInput
     )
