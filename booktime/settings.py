@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'debug_toolbar',
     'django_tables2',
     'rest_framework',
+    'django_filters',
     'main.apps.MainConfig',
 ]
 
