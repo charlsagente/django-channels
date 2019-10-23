@@ -5,15 +5,31 @@ from django.contrib.auth import views as auth_views
 from main import views, models, forms
 from rest_framework import routers
 from main import endpoints
+from django.contrib import admin
 
+# DRF Endpoints
 router = routers.DefaultRouter()
 router.register(r'orderlines', endpoints.PaidOrderLineViewSet)
 router.register(r'orders', endpoints.PaidOrderViewSet)
 
+###################
+
 urlpatterns = [
     path(
+        "admin/",
+        admin.main_admin.urls
+    ),
+    path(
+        "office-admin/",
+        admin.central_office_admin.urls
+    ),
+    path(
+        "dispatch-admin/",
+        admin.dispatchers_admin.urls
+    ),
+    path(
         'api/',
-        include(router.urls),
+        include(router.urls),  # DRF
     ),
     path(
         "order-dashboard/",

@@ -22,14 +22,16 @@ class PaidOrderLineViewSet(viewsets.ModelViewSet):
 class OrderSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = models.Order
-        fields = ('shipping_name',
-                  'shipping_address1',
-                  'shipping_address2',
-                  'shipping_zip_code',
-                  'shipping_city',
-                  'shipping_country',
-                  'date_updated',
-                  'date_added')
+        fields = (
+            'shipping_name',
+            'shipping_address1',
+            'shipping_address2',
+            'shipping_zip_code',
+            'shipping_city',
+            'shipping_country',
+            'date_updated',
+            'date_added'
+            )
 
 
 class PaidOrderViewSet(viewsets.ModelViewSet):
