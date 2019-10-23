@@ -63,6 +63,22 @@ class User(AbstractUser):
 
     objects = UserManager()
 
+    @property
+    def is_employee(self):
+        return self.is_active and (
+            self.is_superuser
+            or self.is_staff
+            and self.groups.filter(name="Employees").exists()
+        )
+
+    @property
+    def is_dispatcher(self):
+        return self.is_active and (
+            self.is_superuser
+            or self.is_staff
+            and self.groups.filter(name="Dispatchers").exists()
+        )
+
 
 class ProductTag(models.Model):
     name = models.CharField(max_length=32)
@@ -152,7 +168,7 @@ class Basket(models.Model):
 
     def create_order(self, billing_address, shipping_address):
         if not self.user:
-            raise exceptions.BasketException(
+            raise Exception(
                 "Cannot create order without user"
             )
         logger.info(
