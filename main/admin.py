@@ -235,12 +235,12 @@ class CentralOfficeOrderAdmin(admin.ModelAdmin):
             "Shipping info",
             {
                 "fields": (
-                    "billing_name",
-                    "billing_address1",
-                    "billing_address2",
-                    "billing_zip_code",
-                    "billing_city",
-                    "billing_country",
+                    "shipping_name",
+                    "shipping_address1",
+                    "shipping_address2",
+                    "shipping_zip_code",
+                    "shipping_city",
+                    "shipping_country",
                 )
             },
         ),
@@ -316,8 +316,8 @@ class ReportingColoredAdminSite(ColoredAdminSite):
             ).annotate(
                 day=TruncDay("date_added")
             )
-                .values("day")
-                .annotate(c=Count("id"))
+            .values("day")
+            .annotate(c=Count("id"))
         )
         labels = [
             x["day"].strftime("%Y-%m-%d") for x in order_data]
@@ -379,7 +379,7 @@ class DispatchersAdminSite(ColoredAdminSite):
 
 
 main_admin = OwnersAdminSite()
-main_admin.register(models.Product, ProductAdmin)
+
 main_admin.register(models.ProductTag, ProductTagAdmin)
 main_admin.register(models.ProductImage, ProductImageAdmin)
 main_admin.register(models.User, UserAdmin)
