@@ -316,8 +316,8 @@ class ReportingColoredAdminSite(ColoredAdminSite):
             ).annotate(
                 day=TruncDay("date_added")
             )
-            .values("day")
-            .annotate(c=Count("id"))
+                .values("day")
+                .annotate(c=Count("id"))
         )
         labels = [
             x["day"].strftime("%Y-%m-%d") for x in order_data]
@@ -388,11 +388,10 @@ main_admin.register(models.Basket, BasketAdmin)
 main_admin.register(models.Order, OrderAdmin)
 
 central_office_admin = CentralOfficeAdminSite(
-    "central-office-admin"
+    "central-office-admin",
 )
 central_office_admin.register(models.Product, ProductAdmin)
-central_office_admin.register(models.ProductTag,
-ProductTagAdmin)
+central_office_admin.register(models.ProductTag, ProductTagAdmin)
 central_office_admin.register(
     models.ProductImage, ProductImageAdmin
 )
@@ -401,8 +400,5 @@ central_office_admin.register(
     models.Order, CentralOfficeOrderAdmin
 )
 dispatchers_admin = DispatchersAdminSite("dispatchers-admin")
-dispatchers_admin.register(
-    models.Product, DispatchersProductAdmin
-)
 dispatchers_admin.register(models.ProductTag, ProductTagAdmin)
 dispatchers_admin.register(models.Order, DispatchersOrderAdmin)
