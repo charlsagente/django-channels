@@ -18,6 +18,22 @@ logger = logging.getLogger(__name__)
 # Register your models here.
 
 
+def make_active(self, request, queryset):
+    queryset.update(active=True)
+
+
+make_active.short_description = "Mark selected items as active"
+
+
+def make_inactive(self, request, queryset):
+    queryset.update(active=False)
+
+
+make_inactive.short_description = (
+    "Mark selected items as inactive"
+)
+
+
 class ProductAdmin(admin.ModelAdmin):
     list_display = ('name', 'slug', 'in_stock', 'price',)
     list_filter = ('active', 'in_stock', 'date_updated',)
@@ -25,6 +41,7 @@ class ProductAdmin(admin.ModelAdmin):
     search_fields = ('name',)
     prepopulated_fields = {"slug": ('name',)}
     autocomplete_fields = ("tags",)
+    actions = [make_active, make_inactive]
 
     # Slug is an important field for our site, it is used in
     # all the product URLS. We want to limit the ability to
@@ -440,6 +457,7 @@ main_admin = OwnersAdminSite()
 
 main_admin.register(models.ProductTag, ProductTagAdmin)
 main_admin.register(models.ProductImage, ProductImageAdmin)
+main_admin.register(models.Product, ProductAdmin)
 main_admin.register(models.User, UserAdmin)
 main_admin.register(models.Address, AddressAdmin)
 main_admin.register(models.Basket, BasketAdmin)
@@ -460,3 +478,52 @@ central_office_admin.register(
 dispatchers_admin = DispatchersAdminSite("dispatchers-admin")
 dispatchers_admin.register(models.ProductTag, ProductTagAdmin)
 dispatchers_admin.register(models.Order, DispatchersOrderAdmin)
+
+from django.shortcuts import get_object_or_404, render
+from django.http import HttpResponse
+from django.template.loader import render_to_string
+from weasyprint import HTML
+import tempfile
+
+
+class InvoiceMixin:
+    def get_urls(self):
+        urls = super().get_urls()
+        my_urls = [
+            path(
+                "invoice/<int:order_id>/",
+                self.admin_view(self.invoice_for_order),
+                name="invoice",
+            )
+        ]
+        return my_urls + urls
+
+    def invoice_for_order(self, request, order_id):
+        order = get_object_or_404(models.Order, pl=order_id)
+        if request.GET.get("format") == "pdf":
+            html_string = render_to_string(
+                "invoice.html", {"order": order}
+            )
+            html = HTML(
+                string=html_string,
+                base_url=request.build_absolute_uri(),
+            )
+            result = html.write_pdf()
+            response = HttpResponse(
+                content_type="application/pdf"
+            )
+            response[
+                "Content-Disposition"
+            ] = "inline; filename=invoice.pdf"
+            response["Content-Transfer-Encoding"] = "binary"
+            with tempfile.NamedTemporaryFile(
+                    delete=True
+            ) as output:
+                output.write(result)
+                output.flush()
+                output = open(output.name, "rb")
+                binary_pdf = output.read()
+                response.write(binary_pdf)
+            return response
+        return render(request, "invoice.html", {"order": order})
+
