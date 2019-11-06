@@ -15,6 +15,7 @@ from django import forms as django_forms
 from django.db import models as django_models
 import django_filters
 from django_filters.views import FilterView
+# Todo: implement tempaltes
 from django.views.generic.edit import FormView, CreateView, UpdateView, DeleteView
 from django.http import HttpResponseRedirect
 from django.urls import reverse

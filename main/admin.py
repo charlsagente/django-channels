@@ -10,11 +10,76 @@ from django.db.models.functions import TruncDay
 from django.db.models import Avg, Count, Min, Sum
 from django.urls import path
 from django.template.response import TemplateResponse
+from django import forms
 
 logger = logging.getLogger(__name__)
 
 
 # Register your models here.
+
+
+def make_active(self, request, queryset):
+    queryset.update(active=True)
+
+
+make_active.short_description = "Mark selected items as active"
+
+
+def make_inactive(self, request, queryset):
+    queryset.update(active=False)
+
+
+make_inactive.short_description = (
+    "Mark selected items as inactive"
+)
+
+from django.shortcuts import get_object_or_404, render
+from django.http import HttpResponse
+from django.template.loader import render_to_string
+from weasyprint import HTML
+import tempfile
+
+
+class InvoiceMixin:
+    def get_urls(self):
+        urls = super().get_urls()
+        my_urls = [
+            path(
+                "invoice/<int:order_id>/",
+                self.admin_view(self.invoice_for_order),
+                name="invoice",
+            )
+        ]
+        return my_urls + urls
+
+    def invoice_for_order(self, request, order_id):
+        order = get_object_or_404(models.Order, pk=order_id)
+        if request.GET.get("format") == "pdf":
+            html_string = render_to_string(
+                "invoice.html", {"order": order}
+            )
+            html = HTML(
+                string=html_string,
+                base_url=request.build_absolute_uri(),
+            )
+            result = html.write_pdf()
+            response = HttpResponse(
+                content_type="application/pdf"
+            )
+            response[
+                "Content-Disposition"
+            ] = "inline; filename=invoice.pdf"
+            response["Content-Transfer-Encoding"] = "binary"
+            with tempfile.NamedTemporaryFile(
+                    delete=True
+            ) as output:
+                output.write(result)
+                output.flush()
+                output = open(output.name, "rb")
+                binary_pdf = output.read()
+                response.write(binary_pdf)
+            return response
+        return render(request, "invoice.html", {"order": order})
 
 
 class ProductAdmin(admin.ModelAdmin):
@@ -24,6 +89,7 @@ class ProductAdmin(admin.ModelAdmin):
     search_fields = ('name',)
     prepopulated_fields = {"slug": ('name',)}
     autocomplete_fields = ("tags",)
+    actions = [make_active, make_inactive]
 
     # Slug is an important field for our site, it is used in
     # all the product URLS. We want to limit the ability to
@@ -235,12 +301,12 @@ class CentralOfficeOrderAdmin(admin.ModelAdmin):
             "Shipping info",
             {
                 "fields": (
-                    "billing_name",
-                    "billing_address1",
-                    "billing_address2",
-                    "billing_zip_code",
-                    "billing_city",
-                    "billing_country",
+                    "shipping_name",
+                    "shipping_address1",
+                    "shipping_address2",
+                    "shipping_zip_code",
+                    "shipping_city",
+                    "shipping_country",
                 )
             },
         ),
@@ -296,6 +362,13 @@ class ColoredAdminSite(admin.sites.AdminSite):
         return context
 
 
+class PeriodSelectForm(forms.Form):
+    PERIODS = ((30, "30 days"), (60, "60 days"), (90, "90 days"))
+    period = forms.TypedChoiceField(
+        choices=PERIODS, coerce=int, required=True
+    )
+
+
 # The following will add reporting views to the list of
 # available urls and will list them from the index page
 class ReportingColoredAdminSite(ColoredAdminSite):
@@ -305,8 +378,49 @@ class ReportingColoredAdminSite(ColoredAdminSite):
             path(
                 "orders_per_day/",
                 self.admin_view(self.orders_per_day),
-            )]
+            ),
+            path(
+                "most_bought_products/",
+                self.admin_view(self.most_bought_products),
+                name="most_bought_products",
+            ),
+        ]
         return my_urls + urls
+
+    def most_bought_products(self, request):
+        if request.method == "POST":
+            form = PeriodSelectForm(request.POST)
+            if form.is_valid():
+                days = form.cleaned_data["period"]
+                starting_day = datetime.now() - timedelta(
+                    days=days)
+                data = (
+                    models.OrderLine.objects.filter(
+                        order__date_added__gt=starting_day
+                    )
+                        .values("product__name")
+                        .annotate(c=Count("id"))
+                )
+                logger.info(
+                    "most_bought_products query: %s", data.query
+                )
+                labels = [x["product__name"] for x in data]
+                values = [x["c"] for x in data]
+        else:
+            form = PeriodSelectForm()
+            labels = None
+            values = None
+
+        context = dict(
+            self.each_context(request),
+            title="Most bought products",
+            form=form,
+            labels=labels,
+            values=values,
+        )
+        return TemplateResponse(
+            request, "most_bought_products.html", context
+        )
 
     def orders_per_day(self, request):
         starting_day = datetime.now() - timedelta(days=180)
@@ -315,10 +429,14 @@ class ReportingColoredAdminSite(ColoredAdminSite):
                 date_added__gt=starting_day
             ).annotate(
                 day=TruncDay("date_added")
+                # Creates a temporary/annotated day field, populating it with data based on the date_added field
+            ).values(
+                "day"  # Uses the new day field as unit of aggregation
+            ).annotate(
+                c=Count("id")  # Counts orders for specific days
             )
-                .values("day")
-                .annotate(c=Count("id"))
-        )
+        )  # The query includes two annotate() calls. The first acts on all rows in the order table, the second acts on the
+        # result of the group_by clause, which is generated by values()
         labels = [
             x["day"].strftime("%Y-%m-%d") for x in order_data]
         values = [x["c"] for x in order_data]
@@ -337,7 +455,12 @@ class ReportingColoredAdminSite(ColoredAdminSite):
             {
                 "name": "Orders per day",
                 "link": "orders_per_day/",
-            }]
+            },
+            {
+                "name": "Most bought products",
+                "link": "most_bought_products/",
+            },
+        ]
         if not extra_context:
             extra_context = {}
         extra_context = {"reporting_pages": reporting_pages}
@@ -345,7 +468,7 @@ class ReportingColoredAdminSite(ColoredAdminSite):
 
 
 # Finally we define 3 instances of AdminSite, each with their own # set of required permissions and colors
-class OwnersAdminSite(ReportingColoredAdminSite):
+class OwnersAdminSite(InvoiceMixin, ReportingColoredAdminSite):
     site_header = "BookTime owners administration"
     site_header_color = "black"
     module_caption_color = "grey"
@@ -356,7 +479,7 @@ class OwnersAdminSite(ReportingColoredAdminSite):
         )
 
 
-class CentralOfficeAdminSite(ReportingColoredAdminSite):
+class CentralOfficeAdminSite(InvoiceMixin, ReportingColoredAdminSite):
     site_header = "BookTime central office administration"
     site_header_color = "purple"
     module_caption_color = "pink"
@@ -379,20 +502,20 @@ class DispatchersAdminSite(ColoredAdminSite):
 
 
 main_admin = OwnersAdminSite()
-main_admin.register(models.Product, ProductAdmin)
+
 main_admin.register(models.ProductTag, ProductTagAdmin)
 main_admin.register(models.ProductImage, ProductImageAdmin)
+main_admin.register(models.Product, ProductAdmin)
 main_admin.register(models.User, UserAdmin)
 main_admin.register(models.Address, AddressAdmin)
 main_admin.register(models.Basket, BasketAdmin)
 main_admin.register(models.Order, OrderAdmin)
 
 central_office_admin = CentralOfficeAdminSite(
-    "central-office-admin"
+    "central-office-admin",
 )
 central_office_admin.register(models.Product, ProductAdmin)
-central_office_admin.register(models.ProductTag,
-ProductTagAdmin)
+central_office_admin.register(models.ProductTag, ProductTagAdmin)
 central_office_admin.register(
     models.ProductImage, ProductImageAdmin
 )
@@ -401,8 +524,5 @@ central_office_admin.register(
     models.Order, CentralOfficeOrderAdmin
 )
 dispatchers_admin = DispatchersAdminSite("dispatchers-admin")
-dispatchers_admin.register(
-    models.Product, DispatchersProductAdmin
-)
 dispatchers_admin.register(models.ProductTag, ProductTagAdmin)
 dispatchers_admin.register(models.Order, DispatchersOrderAdmin)

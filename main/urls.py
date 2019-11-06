@@ -5,7 +5,7 @@ from django.contrib.auth import views as auth_views
 from main import views, models, forms
 from rest_framework import routers
 from main import endpoints
-from django.contrib import admin
+from main import admin
 
 # DRF Endpoints
 router = routers.DefaultRouter()
