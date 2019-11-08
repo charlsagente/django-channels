@@ -27,6 +27,14 @@ from django.views.generic.edit import (
 )
 
 
+def room(request, order_id):
+    return render(
+        request,
+        "chat_room.html",
+        {"room_name_json":str(order_id)}
+    )
+
+
 class ProductListView(ListView):
     template_name = "main/product_list.html"
     paginate_by = 4

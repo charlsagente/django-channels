@@ -112,3 +112,4 @@ node_modules/
 webpack-stats\.json
 
 package-lock\.json
+/dump.rdb

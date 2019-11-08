@@ -232,6 +232,12 @@ class Order(models.Model):
     DONE = 30
     STATUSES = ((NEW, "New"), (PAID, "Paid"), (DONE, "Done"))
 
+    last_spoken_to = models.ForeignKey(
+        User,
+        null=True,
+        related_name="cs_chats",
+        on_delete=models.SET_NULL,
+    )
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     status = models.IntegerField(choices=STATUSES, default=NEW)
 

@@ -113,4 +113,9 @@ urlpatterns = [
     path(
         "signup/", views.SignUpView.as_view(), name="signup"
     ),
+    path(
+      "customer-service/<int:order_id>/",
+      views.room,
+      name="cs_chat",
+    ),
 ]
