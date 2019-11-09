@@ -51,7 +51,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             authorized = True
         else:
             logger.info(
-                "Unauthorized connecrtion from %s",
+                "Unauthorized connection from %s",
                 self.scope["user"],
             )
             await self.close()

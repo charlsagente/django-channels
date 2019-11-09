@@ -16,6 +16,7 @@
     var chatSocket = new ReconnectingWebSocket(
         'ws://' + window.location.host + '/ws/customer-service/' + roomName + '/'
     );
+    chatSocket.debug = true;
     chatSocket.onmessage = function (e) {
         var data = JSON.parse(e.data);
         var username = data['username'];
