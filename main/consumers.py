@@ -57,9 +57,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             await self.close()
 
         if authorized:
-            self.r_conn = await aioredis.create_redis(
-                "redis://localhost"
-            )
+            self.r_conn = await aioredis.create_redis(('localhost', 6379,), db=1)
             await self.accept()
             await self.channel_layer.group_send(
                 self.room_group_name,
