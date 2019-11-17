@@ -199,12 +199,12 @@ WEBPACK_LOADER = {
 }
 
 ASGI_APPLICATION = "booktime.routing.application"
-
+REDIS_URL = "127.0.0.1"
 CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
-            "hosts": [('127.0.0.1', 6379)]
+            "hosts": [(REDIS_URL, 6379)]
         },
     },
 }

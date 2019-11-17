@@ -1,6 +1,7 @@
 import aioredis
 import logging
 from django.shortcuts import get_object_or_404
+from django.conf import settings
 from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from . import models
@@ -58,6 +59,9 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
 
         if authorized:
             self.r_conn = await aioredis.create_redis(('localhost', 6379,), db=1)
+            await self.channel_layer.group_add(
+                self.room_group_name, self.channel_name
+            )
             await self.accept()
             await self.channel_layer.group_send(
                 self.room_group_name,
