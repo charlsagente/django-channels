@@ -118,4 +118,11 @@ urlpatterns = [
       views.room,
       name="cs_chat",
     ),
+    path(
+        "customer-service/",
+        TemplateView.as_view(
+            template_name="customer_service.html"
+        ),
+        name="cs_main",
+    ),
 ]
