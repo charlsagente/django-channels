@@ -68,15 +68,24 @@ class TestConsumers(TestCase):
             await asyncio.sleep(1)
 
             await cs_communicator.send_json_to(
-                {"type": "message", "message": "hello user"}
+                {
+                    "type": "message",
+                    "message": "hello user"
+                }
             )
             self.assertEquals(
                 await communicator.receive_json_from(),
-                {"type": "chat_join", "username": "John Smith"},
+                {
+                    "type": "chat_join",
+                    "username": "John Smith"
+                },
             )
             self.assertEquals(
                 await communicator.receive_json_from(),
-                {"type": "chat_join", "username": "Adam Ford"},
+                {
+                    "type": "chat_join",
+                    "username": "Adam Ford"
+                },
             )
             self.assertEquals(
                 await communicator.receive_json_from(),
