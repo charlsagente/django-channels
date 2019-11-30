@@ -232,5 +232,3 @@ class TestConsumers(TestCase):
 
         loop = asyncio.get_event_loop()
         loop.run_until_complete(test_body())
-
-
