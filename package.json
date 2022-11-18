@@ -31,7 +31,7 @@
     "jest": "^24.9.0",
     "webpack": "^4.39.2",
     "webpack-bundle-tracker": "^0.4.2-beta",
-    "webpack-cli": "^3.3.7"
+    "webpack-cli": "^3.3.12"
   },
   "dependencies": {
     "react": "^16.9.0",
