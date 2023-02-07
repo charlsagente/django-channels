@@ -9,7 +9,7 @@ cached-property==1.5.1
 certifi==2019.6.16
 cffi==1.12.3
 chardet==3.0.4
-cryptography==2.7
+cryptography==39.0.1
 Django==2.2.28
 docker==3.7.3
 docker-compose==1.24.1
